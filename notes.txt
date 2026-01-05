@@ -1,0 +1,9 @@
+#### Important  steps for creating a virtual environment ##############
+# Navigate to your project directory
+cd /path/to/your/zindi-project
+
+# Create virtual environment
+python3 -m venv venv
+
+# Activate it
+source venv/bin/activate
