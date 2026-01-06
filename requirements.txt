@@ -3,13 +3,10 @@ pandas>=2.0.0
 numpy>=1.24.0
 scikit-learn>=1.3.0
 
-# Computer Vision & Video Processing
+# Computer Vision & Video Processing (Classical Methods Only - No Neural Networks)
 opencv-python>=4.8.0
 opencv-contrib-python>=4.8.0
-
-# Deep Learning (Optional - for advanced features)
-torch>=2.0.0
-torchvision>=0.15.0
+scikit-image>=0.21.0
 
 # Google Cloud Storage (for video data access)
 google-cloud-storage>=2.10.0
@@ -39,9 +36,12 @@ pickle5>=0.0.11
 # Feature Engineering
 scipy>=1.11.0
 
-# Optional: Advanced ML Libraries
-xgboost>=1.7.0
+# Machine Learning (Tree-based models - No Backpropagation)
+# Primary: LightGBM for fast, interpretable classification
 lightgbm>=4.0.0
+
+# Alternatives: Other gradient boosting frameworks
+xgboost>=1.7.0
 catboost>=1.2.0
 
 # Testing
