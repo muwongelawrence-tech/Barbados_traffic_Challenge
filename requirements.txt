@@ -31,7 +31,6 @@ pytz>=2023.3
 
 # Model Serialization
 joblib>=1.3.0
-pickle5>=0.0.11
 
 # Feature Engineering
 scipy>=1.11.0
