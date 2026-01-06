@@ -29,21 +29,15 @@ def generate_submission(predictions_enter: np.ndarray, predictions_exit: np.ndar
     pred_exit_names = [class_map[p] for p in predictions_exit]
     
     # Create submission rows
+    # IMPORTANT: Competition only requires ENTRANCE predictions, not exit!
     submission_rows = []
     
     for idx, row in test_df.iterrows():
-        # Entrance prediction
+        # Only entrance prediction (exit predictions are NOT required)
         submission_rows.append({
             'ID': row['ID_enter'],
             'Target': pred_enter_names[idx],
             'Target_Accuracy': pred_enter_names[idx]
-        })
-        
-        # Exit prediction
-        submission_rows.append({
-            'ID': row['ID_exit'],
-            'Target': pred_exit_names[idx],
-            'Target_Accuracy': pred_exit_names[idx]
         })
     
     # Create dataframe
