@@ -30,6 +30,7 @@ def generate_submission(predictions_enter: np.ndarray, predictions_exit: np.ndar
     
     # Create submission rows
     # IMPORTANT: Competition only requires ENTRANCE predictions, not exit!
+    # SampleSubmission.csv is just a FORMAT TEMPLATE, not the actual test IDs
     submission_rows = []
     
     for idx, row in test_df.iterrows():
