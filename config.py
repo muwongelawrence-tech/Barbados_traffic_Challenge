@@ -50,8 +50,7 @@ LIGHTGBM_PARAMS = {
     'bagging_freq': 5,
     'verbose': -1,
     'random_state': RANDOM_SEED,
-    'n_estimators': 500,
-    'early_stopping_rounds': 50
+    'n_estimators': 100  # Reduced for faster training
 }
 
 XGBOOST_PARAMS = {
