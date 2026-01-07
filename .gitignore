@@ -11,6 +11,12 @@ build/
 
 # Virtual Environment
 barbados/
+
+# Video files (large files from GCS)
+videos/
+*.mp4
+*.avi
+*.mov
 venv/
 env/
 ENV/
