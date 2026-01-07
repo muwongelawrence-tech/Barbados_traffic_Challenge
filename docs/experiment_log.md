@@ -72,6 +72,65 @@ This document tracks all experiments, model iterations, and their performance on
 
 ---
 
+### v1.1 - SMOTE Class Balancing (2026-01-07)
+
+**Public Score**: TBD (Pending submission)  
+**Private Score**: TBD  
+**Rank**: TBD
+
+**Model Details**:
+- Algorithm: LightGBM Classifier with SMOTE
+- Features: 37 engineered features (same as v1.0)
+- Training samples: 33,348 (after SMOTE from 12,860)
+- Validation samples: 3,216
+
+**Key Changes**:
+- ✅ Applied SMOTE for class balancing (25% each class)
+- ✅ Increased estimators: 100 → 200
+- ✅ Added max_depth: 8
+- ✅ Better test data preprocessing
+
+**Hyperparameters**:
+```python
+{
+    'objective': 'multiclass',
+    'num_class': 4,
+    'n_estimators': 200,  # Increased
+    'learning_rate': 0.05,
+    'num_leaves': 31,
+    'max_depth': 8,  # Added
+    'feature_fraction': 0.9,
+    'bagging_fraction': 0.8,
+}
+```
+
+**Validation Performance**:
+- Accuracy: 0.8305
+- F1 (weighted): 0.8278
+- Per-class F1: free flowing (0.94), light (0.59), moderate (0.72), heavy (0.76)
+
+**Test Predictions**:
+- free flowing: 64.3%
+- moderate delay: 16.4%
+- light delay: 10.3%
+- heavy delay: 9.1%
+
+**Observations**:
+- ✅ Much better prediction diversity than v1.0
+- ✅ Minority classes now predicted (not just "free flowing")
+- ⚠️ Slight validation F1 decrease (0.8293 → 0.8278)
+- ⚠️ Light delay class has low recall (0.52)
+
+**Expected Improvement**: +0.05 to +0.10 from v1.0
+
+**Files**:
+- Model: `models/v1.1_enter_model_smote.pkl`
+- Submission: `submissions/v1.1_smote_balanced.csv`
+- Code: `train_v1_1.py`
+- Documentation: `docs/experiments/v1.1_smote_balancing.md`
+
+---
+
 ## Planned Experiments
 
 ### v1.1 - Improved Feature Engineering
