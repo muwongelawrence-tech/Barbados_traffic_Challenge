@@ -72,11 +72,13 @@ This document tracks all experiments, model iterations, and their performance on
 
 ---
 
-### v1.1 - SMOTE Class Balancing (2026-01-07)
+### v1.1 - SMOTE Class Balancing (2026-01-07) ❌ FAILED
 
-**Public Score**: TBD (Pending submission)  
+**Public Score**: 0.302442736 ⬇️ (-34.4% from v1.0)  
 **Private Score**: TBD  
-**Rank**: TBD
+**Rank**: Worse than v1.0
+
+**Status**: ❌ **FAILED - Score decreased significantly**
 
 **Model Details**:
 - Algorithm: LightGBM Classifier with SMOTE
@@ -116,18 +118,107 @@ This document tracks all experiments, model iterations, and their performance on
 - heavy delay: 9.1%
 
 **Observations**:
-- ✅ Much better prediction diversity than v1.0
-- ✅ Minority classes now predicted (not just "free flowing")
-- ⚠️ Slight validation F1 decrease (0.8293 → 0.8278)
-- ⚠️ Light delay class has low recall (0.52)
+- ❌ **MAJOR FAILURE**: Score dropped 34.4%
+- ❌ SMOTE caused model to predict 50% "heavy delay"
+- ❌ Test set is likely imbalanced (like training: ~95% free flowing)
+- ❌ Predicting delays when there aren't any = many false positives
+- ✅ Model predictions were diverse (as intended)
+- ✅ But diversity hurt performance on imbalanced test set
 
-**Expected Improvement**: +0.05 to +0.10 from v1.0
+**Root Cause**:
+SMOTE balanced the TRAINING data but test data remained imbalanced. Model learned to predict all classes equally, but test set is ~95% "free flowing". Result: massive false positive rate on delays.
+
+**Key Insight**:
+v1.0's "all free flowing" predictions were actually CLOSER to the truth than v1.1's balanced predictions!
+
+**Lessons Learned**:
+1. ❌ Don't use SMOTE when test set is imbalanced
+2. ❌ Forcing diversity in predictions can hurt if test is imbalanced  
+3. ✅ Respect natural class distribution
+4. ✅ Simple baselines (predict most common) can be hard to beat
+5. ✅ Use class weights instead of resampling for imbalanced data
+
+**Expected Improvement**: +0.05 to +0.10 from v1.0  
+**Actual Result**: -0.16 from v1.0 ❌
 
 **Files**:
 - Model: `models/v1.1_enter_model_smote.pkl`
 - Submission: `submissions/v1.1_smote_balanced.csv`
 - Code: `train_v1_1.py`
 - Documentation: `docs/experiments/v1.1_smote_balancing.md`
+- Post-mortem: `docs/analysis/v1.1_postmortem.md`
+
+---
+
+### v1.2 - Conservative Predictions (2026-01-07)
+
+**Public Score**: TBD (Pending submission)  
+**Private Score**: TBD  
+**Rank**: TBD
+
+**Model Details**:
+- Algorithm: LightGBM with conservative class weights
+- Features: 37 engineered features (same as v1.0/v1.1)
+- Training samples: 12,860 (NO SMOTE - natural distribution)
+- Validation samples: 3,216
+
+**Key Changes from v1.1**:
+- ❌ NO SMOTE - respect natural distribution
+- ✅ Conservative class weights (70% reduction from balanced)
+- ✅ Probability thresholding (threshold=0.6)
+- ✅ More estimators: 200 → 300
+- ✅ Lower learning rate: 0.05 → 0.03
+
+**Hyperparameters**:
+```python
+{
+    'objective': 'multiclass',
+    'num_class': 4,
+    'n_estimators': 300,
+    'learning_rate': 0.03,  # Reduced
+    'max_depth': 6,  # Reduced from 8
+    'min_child_samples': 20,  # Added
+    'class_weight': conservative_weights  # Custom
+}
+```
+
+**Validation Performance**:
+- Accuracy: 0.7422 (lower due to conservative strategy)
+- F1 (weighted): 0.7133
+- Free flowing recall: **0.99** (catches almost all!)
+- Delay precision: 0.83-0.86 (high confidence when predicting delays)
+
+**Test Predictions**:
+- free flowing: 83.8% ← Much better than v1.1's 50%!
+- heavy delay: 5.9%
+- moderate delay: 6.7%
+- light delay: 3.6%
+
+**Strategy**:
+Conservative prediction with probability thresholding:
+1. If P(free flowing) > 0.5 → predict free flowing
+2. Else: only predict delay if P(delay) > 0.6
+3. Otherwise → default to free flowing
+
+**Observations**:
+- ✅ Much more conservative than v1.1 (84% vs 50% free flowing)
+- ✅ Respects natural distribution (training: 65% free flowing)
+- ✅ High recall on majority class (99%)
+- ✅ High precision on delays (83-86%)
+- ⚠️ Lower validation F1 (expected with conservative strategy)
+
+**Expected Improvement**: +0.03 to +0.08 from v1.0 (target: 0.49-0.54)
+
+**Hypothesis**: Should perform better than both v1.0 and v1.1 by:
+- Predicting mostly free flowing (like v1.0)
+- But catching some delays correctly (unlike v1.0)
+- Without false positives (unlike v1.1)
+
+**Files**:
+- Model: `models/v1.2_conservative_model.pkl`
+- Submission: `submissions/v1.2_conservative.csv`
+- Code: `train_v1_2.py`
+- Documentation: `docs/experiments/v1.2_conservative.md`
 
 ---
 
